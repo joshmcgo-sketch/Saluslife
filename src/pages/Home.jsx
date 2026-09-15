@@ -1,0 +1,482 @@
+import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import Seal from '../components/Seal'
+import Reveal from '../components/Reveal'
+import ProductCard from '../components/ProductCard'
+import ProductImage from '../components/ProductImage'
+import ScoreRing from '../components/ScoreRing'
+import Marquee from '../components/Marquee'
+import { useScrollY, useInView } from '../lib/hooks'
+import { STATUS } from '../lib/score'
+import { PROCESS, TRACKS } from '../data/standards'
+import { PRODUCTS } from '../data/products'
+
+const HERO_IDS = ['aurora-infrared-sauna', 'meridian-cold-plunge-xl', 'loch-ard-spring-water']
+
+// Rotating, parallaxing product showcase — the MOHEIM-style 01 / 03 hero image.
+function HeroShowcase() {
+  const items = HERO_IDS.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean)
+  const [active, setActive] = useState(0)
+  const y = useScrollY()
+
+  useEffect(() => {
+    const t = setInterval(() => setActive((i) => (i + 1) % items.length), 3800)
+    return () => clearInterval(t)
+  }, [items.length])
+
+  const current = items[active]
+
+  return (
+    <div
+      className="relative mt-16 md:mt-20"
+      style={{ transform: `translateY(${y * -0.04}px)` }}
+    >
+      <div className="relative mx-auto aspect-[16/10] w-full max-w-5xl overflow-hidden rounded-[28px] border border-line bg-surface shadow-lift md:aspect-[16/9]">
+        {items.map((p, i) => (
+          <div
+            key={p.id}
+            className="absolute inset-0 transition-opacity duration-[900ms] ease-out"
+            style={{ opacity: i === active ? 1 : 0 }}
+          >
+            <ProductImage icon={p.icon} src={p.image} alt={p.name} className="h-full w-full" rounded="rounded-none" />
+          </div>
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+
+        {/* bottom overlay: index · label · arrow */}
+        <Link
+          to={`/product/${current.id}`}
+          className="group absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 md:p-7"
+        >
+          <div className="flex items-center gap-4">
+            <span className="font-display text-sm tabular-nums text-white/80">
+              {String(active + 1).padStart(2, '0')} <span className="text-white/40">/ {String(items.length).padStart(2, '0')}</span>
+            </span>
+            <div className="hidden h-8 w-px bg-white/25 sm:block" />
+            <div>
+              <div className="text-[0.62rem] uppercase tracking-micro text-white/70">{current.category}</div>
+              <div className="font-display text-lg text-white md:text-xl">{current.name}</div>
+            </div>
+          </div>
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/40 text-white transition-transform group-hover:translate-x-1">
+            →
+          </span>
+        </Link>
+
+        {/* dots */}
+        <div className="absolute right-5 top-5 flex gap-1.5 md:right-7 md:top-7">
+          {items.map((p, i) => (
+            <button
+              key={p.id}
+              aria-label={`Show ${p.name}`}
+              onClick={() => setActive(i)}
+              className={`h-1.5 rounded-full transition-all ${i === active ? 'w-6 bg-white' : 'w-1.5 bg-white/50'}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Hero() {
+  const [joined, setJoined] = useState(false)
+  const y = useScrollY()
+
+  return (
+    <section className="relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[560px] bg-gradient-to-b from-surface/50 to-transparent" />
+      <div className="relative mx-auto max-w-content px-6 md:px-8 pt-16 pb-20 md:pt-24">
+        {/* Oversized editorial headline */}
+        <div className="text-center" style={{ transform: `translateY(${y * -0.06}px)`, opacity: Math.max(0, 1 - y / 620) }}>
+          <Reveal>
+            <div className="mb-7 flex justify-center text-bone">
+              <Seal size={128} />
+            </div>
+          </Reveal>
+          <Reveal delay={80}>
+            <div className="eyebrow mb-5">Independent certification authority</div>
+          </Reveal>
+          <Reveal delay={140}>
+            <h1 className="mx-auto max-w-4xl font-display text-[2.9rem] font-medium leading-[0.98] tracking-[-0.02em] sm:text-[4rem] md:text-[5.2rem]">
+              Most products don’t
+              <br className="hidden sm:block" /> clear the bar.{' '}
+              <span className="italic text-accent">These did.</span>
+            </h1>
+          </Reveal>
+          <Reveal delay={220}>
+            <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-mute">
+              A standard, and the small number of products rigorous enough to meet it. No sponsorships.
+              No pay-to-list. If it carries the mark, it earned the mark.
+            </p>
+          </Reveal>
+          <Reveal delay={300}>
+            <form
+              className="mx-auto mt-9 flex max-w-md flex-col gap-2.5 sm:flex-row"
+              onSubmit={(e) => {
+                e.preventDefault()
+                setJoined(true)
+              }}
+            >
+              <input
+                type="email"
+                required
+                placeholder="you@email.com"
+                className="flex-1 rounded-full border border-line bg-raised px-5 py-3 text-sm text-bone placeholder:text-faint outline-none transition-colors focus:border-accent/60"
+              />
+              <button
+                type="submit"
+                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
+              >
+                {joined ? 'You’re on the list ✓' : 'Join the waitlist'}
+              </button>
+            </form>
+          </Reveal>
+        </div>
+
+        <Reveal delay={200}>
+          <HeroShowcase />
+        </Reveal>
+      </div>
+    </section>
+  )
+}
+
+// Scroll-driven dissection: sticky product on the left, its lab internals and
+// rubric reveal line-by-line on the right, and a PASS stamp lands on the image
+// once the verdict scrolls into view.
+function AnatomyOfAPass() {
+  const product = PRODUCTS.find((p) => p.id === 'aurora-infrared-sauna')
+  const track = TRACKS[product.track]
+  const [verdictRef, verdictIn] = useInView({ threshold: 0.55 })
+  const firstLine = product.whyPassed.split('. ')[0] + '.'
+
+  const darkChip = 'rgba(28,30,25,0.74)'
+
+  return (
+    <section className="border-t border-line bg-surface/40">
+      <div className="mx-auto max-w-content px-6 md:px-8 py-24 md:py-28">
+        <Reveal>
+          <div className="flex items-baseline gap-4">
+            <span className="font-display text-sm text-faint">01</span>
+            <span className="text-[0.72rem] font-medium uppercase tracking-micro text-faint">
+              Anatomy of a pass
+            </span>
+          </div>
+          <h2 className="mt-4 max-w-2xl font-display text-[2rem] leading-[1.05] tracking-tight md:text-[2.7rem]">
+            Scroll one verdict, top to bottom.
+          </h2>
+          <p className="mt-4 max-w-xl text-mute">
+            A single certified product, opened up — the independent lab profile, every rubric point,
+            and the binary verdict at the end. Nothing summarized, nothing hidden.
+          </p>
+        </Reveal>
+
+        <div className="mt-16 grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+          {/* Sticky product */}
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="relative overflow-hidden rounded-3xl border border-line shadow-card">
+              <ProductImage
+                icon={product.icon}
+                src={product.image}
+                alt={product.name}
+                className="aspect-[4/5] w-full"
+                rounded="rounded-none"
+              />
+              <div className="absolute inset-x-0 top-0 flex items-start justify-between p-5">
+                <div
+                  className="rounded-xl px-3.5 py-2 backdrop-blur-sm"
+                  style={{ background: darkChip }}
+                >
+                  <div className="text-[0.58rem] uppercase tracking-micro text-white/60">
+                    {product.category}
+                  </div>
+                  <div className="text-sm font-medium text-white">{product.name}</div>
+                  <div className="text-xs text-white/60">{product.brand}</div>
+                </div>
+              </div>
+
+              {/* PASS stamp — lands when the verdict scrolls in */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div
+                  className="transition-all duration-700 ease-out"
+                  style={{
+                    opacity: verdictIn ? 1 : 0,
+                    transform: `scale(${verdictIn ? 1 : 1.35}) rotate(-9deg)`,
+                  }}
+                >
+                  <div
+                    className="flex flex-col items-center rounded-2xl border-2 px-9 py-5 backdrop-blur-sm"
+                    style={{ background: 'rgba(28,30,25,0.8)', borderColor: 'rgba(63,143,94,0.85)' }}
+                  >
+                    <Seal size={28} className="text-pass" />
+                    <div className="mt-2 font-display text-[2rem] leading-none tracking-[0.08em] text-pass">
+                      PASS
+                    </div>
+                    <div className="mt-1.5 text-xs text-white/70">
+                      {product.score} / 100 · {product.testDate}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Revealing internals */}
+          <div>
+            <Reveal>
+              <div className="text-[0.72rem] font-medium uppercase tracking-micro text-faint">
+                Independent lab profile
+              </div>
+              <p className="mt-1.5 text-sm text-mute">What the testing actually found inside it.</p>
+            </Reveal>
+            <div className="mt-5 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
+              {product.reference.items.map((item, i) => {
+                const s = STATUS[item.status]
+                return (
+                  <Reveal key={item.label} delay={i * 40}>
+                    <div className="flex items-center justify-between gap-4 px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <span className="h-2 w-2 rounded-full" style={{ background: s.color }} />
+                        <span className="text-[0.95rem] text-bone">{item.label}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm tabular-nums text-mute">{item.value}</span>
+                        <span
+                          className="rounded-full px-2 py-0.5 text-[0.65rem] font-medium"
+                          style={{ color: s.color, background: `${s.color}1A` }}
+                        >
+                          {s.label}
+                        </span>
+                      </div>
+                    </div>
+                  </Reveal>
+                )
+              })}
+            </div>
+
+            <Reveal>
+              <div className="mb-5 mt-12 text-[0.72rem] font-medium uppercase tracking-micro text-faint">
+                Every rubric point, cleared
+              </div>
+            </Reveal>
+            <div className="space-y-3">
+              {track.rubric.map((item, i) => (
+                <Reveal key={item.title} delay={i * 40}>
+                  <div className="flex items-start gap-3.5 rounded-xl border border-line bg-card px-5 py-4">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-pass/15">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#3F8F5E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                    <div>
+                      <div className="text-[0.95rem] font-medium text-bone">{item.title}</div>
+                      <div className="mt-1 text-sm leading-relaxed text-mute">{product.findings[i]}</div>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+
+            {/* Verdict */}
+            <div ref={verdictRef} className="mt-12 rounded-2xl border border-pass/40 bg-pass/[0.07] p-7">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="text-[0.72rem] font-medium uppercase tracking-micro text-pass">Verdict</div>
+                  <div className="mt-2 font-display text-2xl text-bone">Cleared all five. Mark issued.</div>
+                  <p className="mt-2 max-w-md text-sm leading-relaxed text-mute">{firstLine}</p>
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm text-accent-2 hover:text-bone"
+                  >
+                    Read the full published verdict
+                    <span aria-hidden>→</span>
+                  </Link>
+                </div>
+                <ScoreRing score={product.score} size={96} stroke={6} className="shrink-0" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function TrustStrip() {
+  const stats = [
+    { k: 'Binary', v: 'Pass or fail — no partial credit' },
+    { k: '$0', v: 'To be considered — submissions are free' },
+    { k: 'Published', v: 'Full reasoning behind every verdict' },
+  ]
+  return (
+    <section className="hairline">
+      <div className="mx-auto grid max-w-content grid-cols-1 divide-y divide-line border-x border-line md:grid-cols-3 md:divide-x md:divide-y-0">
+        {stats.map((s, i) => (
+          <Reveal key={s.k} delay={i * 100} className="px-6 py-8 md:px-8">
+            <div className="font-display text-2xl text-bone">{s.k}</div>
+            <div className="mt-1.5 text-sm text-mute">{s.v}</div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function StandardsTeaser() {
+  const tracks = [TRACKS.equipment, TRACKS.ingestibles, TRACKS.household]
+  return (
+    <section className="mx-auto max-w-content px-6 md:px-8 py-24">
+      <Reveal>
+        <div className="eyebrow">The Standard</div>
+        <h2 className="mt-3 max-w-xl font-display text-[2rem] leading-tight text-bone md:text-[2.4rem]">
+          One mark, held to the right test for each thing it certifies.
+        </h2>
+        <p className="mt-4 max-w-xl text-mute">
+          Equipment, ingestibles, and household products fail for different reasons, so each is held
+          to its own standard — not one generic checklist stretched to cover everything.
+        </p>
+      </Reveal>
+
+      <div className="mt-12 grid gap-5 md:grid-cols-3">
+        {tracks.map((t, i) => (
+          <Reveal key={t.id} delay={i * 120}>
+            <Link
+              to={`/standards/${t.id}`}
+              className="group flex h-full flex-col rounded-2xl border border-line bg-card p-8 shadow-card transition-all duration-150 hover:-translate-y-1 hover:shadow-lift"
+            >
+              <div className="flex items-center justify-between">
+                <span className="eyebrow">{t.name}</span>
+                {t.flagship && (
+                  <span className="rounded-full bg-accent/12 px-2.5 py-1 text-[0.65rem] font-medium text-accent-2">
+                    Flagship category
+                  </span>
+                )}
+              </div>
+              <h3 className="mt-3 font-display text-2xl text-bone">{t.tagline}</h3>
+              <p className="mt-3 flex-1 text-[0.95rem] leading-relaxed text-mute">{t.lede}</p>
+              <div className="mt-6 flex items-center gap-2 text-sm text-accent-2">
+                Read the 5-part standard
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </div>
+            </Link>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function Process() {
+  return (
+    <section className="hairline bg-surface/60">
+      <div className="mx-auto max-w-content px-6 md:px-8 py-24">
+        <Reveal>
+          <div className="eyebrow">How it works</div>
+          <h2 className="mt-3 max-w-lg font-display text-[2rem] leading-tight text-bone md:text-[2.4rem]">
+            How a product earns the mark
+          </h2>
+        </Reveal>
+        <div className="mt-14 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          {PROCESS.map((step, i) => (
+            <Reveal key={step.num} delay={i * 100}>
+              <div className="flex flex-col">
+                <div className="font-display text-3xl text-accent-2">{step.num}</div>
+                <div className="mt-4 h-px w-10 bg-line" />
+                <h4 className="mt-4 text-base font-semibold text-bone">{step.title}</h4>
+                <p className="mt-2 text-sm leading-relaxed text-mute">{step.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Featured() {
+  const featured = PRODUCTS.filter((p) =>
+    ['aurora-infrared-sauna', 'loch-ard-spring-water', 'meridian-cold-plunge-xl', 'northfield-grass-fed-whey'].includes(p.id),
+  )
+  return (
+    <section className="mx-auto max-w-content px-6 md:px-8 py-24">
+      <Reveal>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="eyebrow">Marked products</div>
+            <h2 className="mt-3 font-display text-[2rem] leading-tight text-bone md:text-[2.4rem]">
+              A sample of what’s cleared so far
+            </h2>
+          </div>
+          <Link to="/catalog" className="text-sm text-accent-2 hover:text-bone">
+            View the full catalog →
+          </Link>
+        </div>
+        <p className="mt-4 max-w-xl text-sm text-mute">
+          Illustrative entries with fabricated test data for this demo — not live listings.
+        </p>
+      </Reveal>
+
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {featured.map((p, i) => (
+          <Reveal key={p.id} delay={i * 90}>
+            <ProductCard product={p} />
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function BrandsCTA() {
+  return (
+    <section className="mx-auto max-w-content px-6 md:px-8 pb-8">
+      <Reveal>
+        <div className="relative overflow-hidden rounded-3xl border border-line bg-card p-10 md:p-14 shadow-card">
+          <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
+            <div className="max-w-xl">
+              <h2 className="font-display text-[1.8rem] leading-tight text-bone md:text-[2.1rem]">
+                Brands don’t buy the mark. They earn it.
+              </h2>
+              <p className="mt-4 text-mute">
+                We don’t accept sponsorships and we don’t sell placement. If your product can survive
+                independent testing, we want it — and if it can’t, no amount of budget changes that.
+              </p>
+            </div>
+            <Link
+              to="/catalog"
+              className="shrink-0 rounded-full bg-bone px-7 py-3.5 text-sm font-medium text-ink transition-transform hover:scale-[1.03]"
+            >
+              Submit a product
+            </Link>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  )
+}
+
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <TrustStrip />
+      <AnatomyOfAPass />
+      <StandardsTeaser />
+      <Marquee
+        items={[
+          'Sourced',
+          'Lab-tested',
+          'Disclosed',
+          'Independent',
+          'Published',
+          'Verified',
+          'No pay-to-list',
+        ]}
+      />
+      <Process />
+      <Featured />
+      <BrandsCTA />
+    </>
+  )
+}
