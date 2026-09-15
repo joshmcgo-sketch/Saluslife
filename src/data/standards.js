@@ -49,14 +49,14 @@ export const TRACKS = {
     ],
   },
 
-  ingestibles: {
-    id: 'ingestibles',
-    name: 'Ingestibles',
+  nutrition: {
+    id: 'nutrition',
+    name: 'Nutrition',
     tagline: 'Food & supplements',
     icon: 'capsule',
     flagship: false,
     lede:
-      'Sourcing and ingredient claims are self-reported, and greenwashing is rampant. Ingestibles lean on independent lab scorers for the chemistry, and on Salus Life for the sourcing and transparency review that labs do not do.',
+      'Sourcing and ingredient claims are self-reported, and greenwashing is rampant. Nutrition leans on independent lab scorers for the chemistry, and on Salus Life for the sourcing and transparency review that labs do not do.',
     rubric: [
       {
         title: 'Sourcing & agricultural practice',

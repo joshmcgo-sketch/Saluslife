@@ -21,7 +21,7 @@ export default function Footer() {
             <div className="eyebrow mb-4">The Standard</div>
             <ul className="space-y-2.5 text-sm text-mute">
               <li><Link to="/standards/equipment" className="hover:text-bone">Equipment standard</Link></li>
-              <li><Link to="/standards/ingestibles" className="hover:text-bone">Ingestibles standard</Link></li>
+              <li><Link to="/standards/nutrition" className="hover:text-bone">Nutrition standard</Link></li>
               <li><Link to="/standards/household" className="hover:text-bone">Household standard</Link></li>
               <li><Link to="/catalog" className="hover:text-bone">Marked products</Link></li>
               <li><Link to="/mission" className="hover:text-bone">Mission & method</Link></li>
@@ -40,6 +40,7 @@ export default function Footer() {
         <div className="mt-14 flex flex-col gap-2 border-t border-line pt-6 text-xs text-faint sm:flex-row sm:items-center sm:justify-between">
           <span>Salus Life — investor demo with fictional test data.</span>
           <span>© {new Date().getFullYear()} Salus Life Standards</span>
+          <span>Co-founded by Joshua McGovern & Stephen Schiele</span>
         </div>
       </div>
     </footer>

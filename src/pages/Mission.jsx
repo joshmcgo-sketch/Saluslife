@@ -119,12 +119,12 @@ export default function Mission() {
           <Reveal>
             <div className="eyebrow">Where we start</div>
             <h2 className="mt-3 font-display text-[1.9rem] leading-tight text-bone">
-              Equipment is the flagship. Ingestibles come second.
+              Equipment is the flagship. Nutrition comes second.
             </h2>
             <p className="mt-5 text-[1.02rem] leading-relaxed text-mute">
               We’re launching with saunas, cold plunges, and recovery tech precisely because no
               independent standard exists there to compete with. It’s the category where a credible
-              mark is worth the most and where the vacuum is most obvious. Ingestibles already have
+              mark is worth the most and where the vacuum is most obvious. Nutrition already has
               independent lab scorers to lean on; durable wellness goods have nobody.
             </p>
           </Reveal>
@@ -140,12 +140,12 @@ export default function Mission() {
               <span className="text-accent-2 transition-transform group-hover:translate-x-1">→</span>
             </Link>
             <Link
-              to="/standards/ingestibles"
+              to="/standards/nutrition"
               className="group flex items-center justify-between rounded-2xl border border-line bg-card p-6 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift"
             >
               <div>
                 <div className="text-xs uppercase tracking-micro text-faint">Secondary</div>
-                <div className="mt-1 font-display text-lg text-bone">The Ingestibles standard</div>
+                <div className="mt-1 font-display text-lg text-bone">The Nutrition standard</div>
               </div>
               <span className="text-accent-2 transition-transform group-hover:translate-x-1">→</span>
             </Link>

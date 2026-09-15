@@ -27,7 +27,7 @@ function CartButton({ className = '' }) {
 
 const LINKS = [
   { to: '/standards/equipment', label: 'Equipment' },
-  { to: '/standards/ingestibles', label: 'Ingestibles' },
+  { to: '/standards/nutrition', label: 'Nutrition' },
   { to: '/standards/household', label: 'Household' },
   { to: '/catalog', label: 'Marked products' },
   { to: '/mission', label: 'Mission' },

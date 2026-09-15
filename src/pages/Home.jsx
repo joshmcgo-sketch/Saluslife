@@ -324,7 +324,7 @@ function TrustStrip() {
 }
 
 function StandardsTeaser() {
-  const tracks = [TRACKS.equipment, TRACKS.ingestibles, TRACKS.household]
+  const tracks = [TRACKS.equipment, TRACKS.nutrition, TRACKS.household]
   return (
     <section className="mx-auto max-w-content px-6 md:px-8 py-24">
       <Reveal>
@@ -333,7 +333,7 @@ function StandardsTeaser() {
           One mark, held to the right test for each thing it certifies.
         </h2>
         <p className="mt-4 max-w-xl text-mute">
-          Equipment, ingestibles, and household products fail for different reasons, so each is held
+          Equipment, nutrition, and household products fail for different reasons, so each is held
           to its own standard — not one generic checklist stretched to cover everything.
         </p>
       </Reveal>

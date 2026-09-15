@@ -33,7 +33,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/mission" element={<Mission />} />
             <Route path="/standards/equipment" element={<StandardsPage trackId="equipment" />} />
-            <Route path="/standards/ingestibles" element={<StandardsPage trackId="ingestibles" />} />
+            <Route path="/standards/nutrition" element={<StandardsPage trackId="nutrition" />} />
             <Route path="/standards/household" element={<StandardsPage trackId="household" />} />
             <Route path="/catalog" element={<Catalog />} />
             <Route path="/product/:id" element={<ProductDetail />} />
