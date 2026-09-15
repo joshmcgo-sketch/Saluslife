@@ -31,6 +31,7 @@ const LINKS = [
   { to: '/standards/household', label: 'Household' },
   { to: '/catalog', label: 'Marked products' },
   { to: '/mission', label: 'Mission' },
+  { to: '/orders', label: 'My Orders' },
 ]
 
 export default function Navbar() {

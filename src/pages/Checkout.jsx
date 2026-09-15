@@ -79,12 +79,20 @@ export default function Checkout() {
           <p className="mx-auto mt-4 max-w-md text-xs text-faint">
             This is a demo — no payment was taken and nothing will ship.
           </p>
-          <Link
-            to="/catalog"
-            className="mt-8 inline-block rounded-full bg-bone px-6 py-3 text-sm font-medium text-ink transition-transform hover:scale-[1.03]"
-          >
-            Back to the catalog
-          </Link>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/catalog"
+              className="inline-block rounded-full bg-bone px-6 py-3 text-sm font-medium text-ink transition-transform hover:scale-[1.03]"
+            >
+              Back to the catalog
+            </Link>
+            <Link
+              to="/orders"
+              className="inline-block rounded-full border border-line px-6 py-3 text-sm text-bone transition-colors hover:border-bone/40"
+            >
+              Track your order
+            </Link>
+          </div>
         </Reveal>
       </div>
     )
