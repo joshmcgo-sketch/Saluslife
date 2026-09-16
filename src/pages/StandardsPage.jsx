@@ -14,10 +14,10 @@ export default function StandardsPage({ trackId }) {
 
   return (
     <>
-      {/* Hero */}
+      {/* Header — short, so the products below are visible immediately */}
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-accent/[0.06] to-transparent" />
-        <div className="relative mx-auto max-w-content px-6 md:px-8 pt-16 pb-12">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-accent/[0.06] to-transparent" />
+        <div className="relative mx-auto max-w-content px-6 md:px-8 pt-14 pb-8">
           <Reveal>
             <div className="flex items-center gap-3">
               <span className="eyebrow">The Standard</span>
@@ -30,14 +30,45 @@ export default function StandardsPage({ trackId }) {
             <h1 className="mt-4 max-w-3xl font-display text-[2.4rem] font-medium leading-[1.08] tracking-tight md:text-[3.1rem]">
               {track.name}: {track.tagline}
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-mute">{track.lede}</p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Marked products in this track — the first thing you see */}
+      <section>
+        <div className="mx-auto max-w-content px-6 md:px-8 pb-16">
+          <Reveal>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="eyebrow">
+                {count} marked {track.name.toLowerCase()} product{count === 1 ? '' : 's'}
+              </div>
+              <Link to="/catalog" className="text-sm text-accent-2 hover:text-bone">
+                All categories →
+              </Link>
+            </div>
+          </Reveal>
+
+          {products.length > 0 ? (
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {products.map((p, i) => (
+                <Reveal key={p.id} delay={(i % 3) * 90}>
+                  <ProductCard product={p} />
+                </Reveal>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-6 text-mute">Nothing has cleared this standard yet.</p>
+          )}
+        </div>
+      </section>
+
+      {/* About this standard */}
+      <section className="hairline bg-surface/60">
+        <div className="mx-auto max-w-content px-6 md:px-8 py-16">
+          <Reveal>
+            <div className="eyebrow">About this standard</div>
+            <p className="mt-3 max-w-2xl text-lg leading-relaxed text-mute">{track.lede}</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <a
-                href="#marked-products"
-                className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
-              >
-                See {count} marked {track.name.toLowerCase()} products
-              </a>
               {others.map((o) => (
                 <Link
                   key={o.id}
@@ -49,37 +80,6 @@ export default function StandardsPage({ trackId }) {
               ))}
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* Marked products in this track */}
-      <section id="marked-products" className="hairline scroll-mt-20">
-        <div className="mx-auto max-w-content px-6 md:px-8 py-16">
-          <Reveal>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <div className="eyebrow">Carries the mark</div>
-                <h2 className="mt-3 font-display text-[1.7rem] text-bone">
-                  {count} marked {track.name.toLowerCase()} product{count === 1 ? '' : 's'}
-                </h2>
-              </div>
-              <Link to="/catalog" className="text-sm text-accent-2 hover:text-bone">
-                All categories →
-              </Link>
-            </div>
-          </Reveal>
-
-          {products.length > 0 ? (
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((p, i) => (
-                <Reveal key={p.id} delay={(i % 3) * 90}>
-                  <ProductCard product={p} />
-                </Reveal>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-8 text-mute">Nothing has cleared this standard yet.</p>
-          )}
         </div>
       </section>
 
