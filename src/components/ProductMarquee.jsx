@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import ProductImage from './ProductImage'
+import ScoreRing from './ScoreRing'
 import { PRODUCTS } from '../data/products'
-import { scoreColor } from '../lib/score'
 
 // Continuously scrolling row of product tiles — each shows the product image
 // with its rating in the top-right corner, and name/brand below. Content is
@@ -27,13 +27,10 @@ export default function ProductMarquee({ products = PRODUCTS, duration = 70 }) {
                     className="aspect-[4/5] w-full"
                     rounded="rounded-none"
                   />
-                  {/* rating — top-right corner */}
-                  <span
-                    className="absolute right-2.5 top-2.5 rounded-full bg-raised/90 px-2 py-0.5 text-xs font-semibold tabular-nums shadow-sm backdrop-blur-sm"
-                    style={{ color: scoreColor(p.score) }}
-                  >
-                    {p.score}
-                  </span>
+                  {/* rating — score ring in the top-right corner */}
+                  <div className="absolute right-2 top-2 rounded-full bg-raised/95 p-1 shadow-sm ring-1 ring-line/60 backdrop-blur-sm">
+                    <ScoreRing score={p.score} size={38} stroke={3.5} showTotal={false} />
+                  </div>
                 </div>
                 <div className="mt-3 px-1">
                   <div className="text-[0.58rem] uppercase tracking-micro text-faint">{p.category}</div>
