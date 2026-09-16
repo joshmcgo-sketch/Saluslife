@@ -1,10 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { viteSingleFile } from 'vite-plugin-singlefile'
 
-// `npm run build` inlines all JS + CSS into a single dist/index.html so it can
-// be shared as one openable file (double-click, no server needed).
+// Production build for hosting (Vercel/Netlify): standard chunked output with
+// hashed, cacheable assets and images served as separate files.
 export default defineConfig({
-  base: './',
-  plugins: [react(), viteSingleFile()],
+  plugins: [react()],
 })
