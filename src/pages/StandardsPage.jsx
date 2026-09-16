@@ -2,13 +2,15 @@ import { Link } from 'react-router-dom'
 import Seal from '../components/Seal'
 import Reveal from '../components/Reveal'
 import ProductImage from '../components/ProductImage'
+import ProductCard from '../components/ProductCard'
 import { TRACKS, PROCESS } from '../data/standards'
 import { productsByTrack } from '../data/products'
 
 export default function StandardsPage({ trackId }) {
   const track = TRACKS[trackId]
   const others = Object.values(TRACKS).filter((t) => t.id !== trackId)
-  const count = productsByTrack(trackId).length
+  const products = productsByTrack(trackId)
+  const count = products.length
 
   return (
     <>
@@ -30,12 +32,12 @@ export default function StandardsPage({ trackId }) {
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-mute">{track.lede}</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                to="/catalog"
+              <a
+                href="#marked-products"
                 className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
               >
                 See {count} marked {track.name.toLowerCase()} products
-              </Link>
+              </a>
               {others.map((o) => (
                 <Link
                   key={o.id}
@@ -47,6 +49,37 @@ export default function StandardsPage({ trackId }) {
               ))}
             </div>
           </Reveal>
+        </div>
+      </section>
+
+      {/* Marked products in this track */}
+      <section id="marked-products" className="hairline scroll-mt-20">
+        <div className="mx-auto max-w-content px-6 md:px-8 py-16">
+          <Reveal>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <div className="eyebrow">Carries the mark</div>
+                <h2 className="mt-3 font-display text-[1.7rem] text-bone">
+                  {count} marked {track.name.toLowerCase()} product{count === 1 ? '' : 's'}
+                </h2>
+              </div>
+              <Link to="/catalog" className="text-sm text-accent-2 hover:text-bone">
+                All categories →
+              </Link>
+            </div>
+          </Reveal>
+
+          {products.length > 0 ? (
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {products.map((p, i) => (
+                <Reveal key={p.id} delay={(i % 3) * 90}>
+                  <ProductCard product={p} />
+                </Reveal>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 text-mute">Nothing has cleared this standard yet.</p>
+          )}
         </div>
       </section>
 
