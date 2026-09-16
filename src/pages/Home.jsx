@@ -1,83 +1,16 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Seal from '../components/Seal'
 import Reveal from '../components/Reveal'
 import ProductCard from '../components/ProductCard'
 import ProductImage from '../components/ProductImage'
 import ScoreRing from '../components/ScoreRing'
 import Marquee from '../components/Marquee'
+import ProductMarquee from '../components/ProductMarquee'
 import { useScrollY, useInView } from '../lib/hooks'
 import { STATUS } from '../lib/score'
 import { PROCESS, TRACKS } from '../data/standards'
 import { PRODUCTS } from '../data/products'
-
-const HERO_IDS = ['aurora-infrared-sauna', 'meridian-cold-plunge-xl', 'loch-ard-spring-water']
-
-// Rotating, parallaxing product showcase — the MOHEIM-style 01 / 03 hero image.
-function HeroShowcase() {
-  const items = HERO_IDS.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean)
-  const [active, setActive] = useState(0)
-  const y = useScrollY()
-
-  useEffect(() => {
-    const t = setInterval(() => setActive((i) => (i + 1) % items.length), 3800)
-    return () => clearInterval(t)
-  }, [items.length])
-
-  const current = items[active]
-
-  return (
-    <div
-      className="relative mt-16 md:mt-20"
-      style={{ transform: `translateY(${y * -0.04}px)` }}
-    >
-      <div className="relative mx-auto aspect-[16/10] w-full max-w-5xl overflow-hidden rounded-[28px] border border-line bg-surface shadow-lift md:aspect-[16/9]">
-        {items.map((p, i) => (
-          <div
-            key={p.id}
-            className="absolute inset-0 transition-opacity duration-[900ms] ease-out"
-            style={{ opacity: i === active ? 1 : 0 }}
-          >
-            <ProductImage icon={p.icon} src={p.image} alt={p.name} className="h-full w-full" rounded="rounded-none" />
-          </div>
-        ))}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
-
-        {/* bottom overlay: index · label · arrow */}
-        <Link
-          to={`/product/${current.id}`}
-          className="group absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 md:p-7"
-        >
-          <div className="flex items-center gap-4">
-            <span className="font-display text-sm tabular-nums text-white/80">
-              {String(active + 1).padStart(2, '0')} <span className="text-white/40">/ {String(items.length).padStart(2, '0')}</span>
-            </span>
-            <div className="hidden h-8 w-px bg-white/25 sm:block" />
-            <div>
-              <div className="text-[0.62rem] uppercase tracking-micro text-white/70">{current.category}</div>
-              <div className="font-display text-lg text-white md:text-xl">{current.name}</div>
-            </div>
-          </div>
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/40 text-white transition-transform group-hover:translate-x-1">
-            →
-          </span>
-        </Link>
-
-        {/* dots */}
-        <div className="absolute right-5 top-5 flex gap-1.5 md:right-7 md:top-7">
-          {items.map((p, i) => (
-            <button
-              key={p.id}
-              aria-label={`Show ${p.name}`}
-              onClick={() => setActive(i)}
-              className={`h-1.5 rounded-full transition-all ${i === active ? 'w-6 bg-white' : 'w-1.5 bg-white/50'}`}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function Hero() {
   const [joined, setJoined] = useState(false)
@@ -135,7 +68,7 @@ function Hero() {
         </div>
 
         <Reveal delay={200}>
-          <HeroShowcase />
+          <ProductMarquee />
         </Reveal>
       </div>
     </section>
