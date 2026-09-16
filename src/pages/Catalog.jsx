@@ -1,12 +1,24 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import ProductCard from '../components/ProductCard'
 import { PRODUCTS, GROUP_META } from '../data/products'
 
 const FILTERS = [{ id: 'all', label: 'All products' }, ...GROUP_META]
+const VALID_FILTER_IDS = new Set(FILTERS.map((f) => f.id))
 
 export default function Catalog() {
-  const [filter, setFilter] = useState('all')
+  const [searchParams] = useSearchParams()
+  // Lets a search result like "food" deep-link straight to /catalog?group=food.
+  const [filter, setFilter] = useState(() => {
+    const g = searchParams.get('group')
+    return VALID_FILTER_IDS.has(g) ? g : 'all'
+  })
+
+  useEffect(() => {
+    const g = searchParams.get('group')
+    if (VALID_FILTER_IDS.has(g)) setFilter(g)
+  }, [searchParams])
 
   const products = useMemo(() => {
     const list = filter === 'all' ? PRODUCTS : PRODUCTS.filter((p) => p.group === filter)

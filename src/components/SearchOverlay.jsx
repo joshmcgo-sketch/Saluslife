@@ -3,6 +3,23 @@ import { useNavigate } from 'react-router-dom'
 import ProductImage from './ProductImage'
 import { PRODUCTS } from '../data/products'
 
+// Broad, less-descriptive words (e.g. "food") jump straight to a category or
+// standard page instead of only matching individual product/brand names.
+const SECTIONS = [
+  { to: '/catalog?group=equipment', label: 'Equipment', hint: 'Category', keys: ['equipment', 'gear'] },
+  { to: '/catalog?group=food', label: 'Food', hint: 'Category', keys: ['food', 'foods', 'perishable', 'perishables', 'groceries'] },
+  { to: '/catalog?group=supplements', label: 'Supplements', hint: 'Category', keys: ['supplement', 'supplements', 'vitamin', 'vitamins'] },
+  { to: '/catalog?group=drinks', label: 'Water & Drinks', hint: 'Category', keys: ['drink', 'drinks', 'water', 'beverage', 'beverages'] },
+  { to: '/catalog?group=cleaning', label: 'Cleaning', hint: 'Category', keys: ['cleaning', 'clean'] },
+  { to: '/standards/household', label: 'Household standard', hint: 'Standard', keys: ['household'] },
+  { to: '/standards/nutrition', label: 'Nutrition standard', hint: 'Standard', keys: ['nutrition'] },
+]
+
+function matchSections(q) {
+  if (q.length < 2) return []
+  return SECTIONS.filter((s) => s.keys.some((k) => k.includes(q) || q.includes(k)))
+}
+
 export default function SearchOverlay({ isOpen, onClose }) {
   const [query, setQuery] = useState('')
   const inputRef = useRef(null)
@@ -31,13 +48,14 @@ export default function SearchOverlay({ isOpen, onClose }) {
   }, [isOpen, onClose])
 
   const q = query.trim().toLowerCase()
+  const sectionResults = q ? matchSections(q) : []
   const results = q
     ? PRODUCTS.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.brand.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q),
-      ).slice(0, 8)
+      ).slice(0, 6)
     : []
 
   const goTo = (id) => {
@@ -45,9 +63,16 @@ export default function SearchOverlay({ isOpen, onClose }) {
     navigate(`/product/${id}`)
   }
 
+  const goToSection = (to) => {
+    onClose()
+    navigate(to)
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (results[0]) goTo(results[0].id)
+    // A broad category/standard word wins over an incidental product match.
+    if (sectionResults[0]) goToSection(sectionResults[0].to)
+    else if (results[0]) goTo(results[0].id)
   }
 
   return (
@@ -89,9 +114,33 @@ export default function SearchOverlay({ isOpen, onClose }) {
           </form>
 
           <div className="max-h-[60vh] overflow-y-auto">
-            {q && results.length === 0 && (
-              <p className="px-5 py-8 text-center text-sm text-mute">No products match “{query}”.</p>
+            {q && sectionResults.length === 0 && results.length === 0 && (
+              <p className="px-5 py-8 text-center text-sm text-mute">No matches for “{query}”.</p>
             )}
+
+            {sectionResults.length > 0 && (
+              <div className="border-b border-line py-2">
+                {sectionResults.map((s) => (
+                  <button
+                    key={s.to}
+                    onClick={() => goToSection(s.to)}
+                    className="flex w-full items-center gap-3 px-5 py-2.5 text-left transition-colors hover:bg-card"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line text-mute">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 7h4l2-2h6l2 2h4v12H3z" />
+                      </svg>
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm text-bone">{s.label}</div>
+                      <div className="text-xs text-faint">{s.hint}</div>
+                    </div>
+                    <span className="shrink-0 text-faint">→</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
             {results.map((p) => (
               <button
                 key={p.id}
@@ -109,7 +158,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
             ))}
             {!q && (
               <p className="px-5 py-8 text-center text-sm text-faint">
-                Start typing to search marked products.
+                Start typing to search marked products — or a category like “food” or “equipment”.
               </p>
             )}
           </div>
