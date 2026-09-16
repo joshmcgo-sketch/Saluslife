@@ -377,7 +377,7 @@ function BrandsCTA() {
               </p>
             </div>
             <Link
-              to="/catalog"
+              to="/submit"
               className="shrink-0 rounded-full bg-bone px-7 py-3.5 text-sm font-medium text-ink transition-transform hover:scale-[1.03]"
             >
               Submit a product

@@ -79,7 +79,7 @@ export default function Navbar() {
 
           <div className="hidden lg:flex items-center gap-3">
             <Link
-              to="/catalog"
+              to="/submit"
               className="rounded-full border border-line px-4 py-1.5 text-sm text-bone/90 transition-colors hover:border-bone/40 hover:text-bone"
             >
               Submit a product
@@ -115,7 +115,7 @@ export default function Navbar() {
                 {l.label}
               </NavLink>
             ))}
-            <Link to="/catalog" className="text-accent-2">Submit a product →</Link>
+            <Link to="/submit" className="text-accent-2">Submit a product →</Link>
           </nav>
         </div>
       )}
