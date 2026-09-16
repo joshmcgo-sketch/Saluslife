@@ -5,6 +5,7 @@ import Reveal from '../components/Reveal'
 import ScoreRing from '../components/ScoreRing'
 import ProductImage from '../components/ProductImage'
 import ReferenceCard from '../components/ReferenceCard'
+import ProductReviews from '../components/ProductReviews'
 import QtyStepper from '../components/QtyStepper'
 import { getProduct, productsByTrack } from '../data/products'
 import { TRACKS } from '../data/standards'
@@ -194,6 +195,19 @@ export default function ProductDetail() {
                 <ReferenceCard reference={product.reference} productName={product.name} />
               </Reveal>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Customer reviews */}
+      <section className="hairline">
+        <div className="mx-auto max-w-content px-6 md:px-8 py-16">
+          <Reveal>
+            <div className="eyebrow">Customer reviews</div>
+            <h2 className="mt-3 font-display text-xl text-bone">What buyers say about {product.name}</h2>
+          </Reveal>
+          <div className="mt-8">
+            <ProductReviews productId={product.id} />
           </div>
         </div>
       </section>

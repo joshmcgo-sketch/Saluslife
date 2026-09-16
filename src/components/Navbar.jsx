@@ -1,7 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import Seal from './Seal'
+import SearchOverlay from './SearchOverlay'
 import { useCart } from '../context/CartContext'
+
+function SearchButton({ onClick, className = '' }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label="Search products"
+      className={`flex h-9 w-9 items-center justify-center rounded-full border border-line text-bone transition-colors hover:border-bone/40 ${className}`}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+    </button>
+  )
+}
 
 function CartButton({ className = '' }) {
   const { count, openCart } = useCart()
@@ -37,6 +53,7 @@ const LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const { pathname } = useLocation()
 
   useEffect(() => {
@@ -51,6 +68,7 @@ export default function Navbar() {
   }, [pathname])
 
   return (
+    <>
     <header
       className={`sticky top-0 z-50 transition-colors duration-300 ${
         scrolled ? 'bg-ink/85 backdrop-blur-md border-b border-line' : 'border-b border-transparent'
@@ -84,10 +102,12 @@ export default function Navbar() {
             >
               Submit a product
             </Link>
+            <SearchButton onClick={() => setSearchOpen(true)} />
             <CartButton />
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
+            <SearchButton onClick={() => setSearchOpen(true)} />
             <CartButton />
             <button
               className="-mr-1 flex h-9 w-9 items-center justify-center rounded-full border border-line text-bone"
@@ -120,5 +140,7 @@ export default function Navbar() {
         </div>
       )}
     </header>
+    <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   )
 }
