@@ -19,17 +19,17 @@ export default function ProductMarquee({ products = PRODUCTS, duration = 70 }) {
                 className="group mx-2.5 w-44 shrink-0 sm:w-52"
                 tabIndex={dup === 1 ? -1 : 0}
               >
-                <div className="relative overflow-hidden rounded-2xl border border-line bg-card shadow-card transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lift">
+                <div className="relative aspect-[4/5] w-full transition-transform duration-200 ease-out group-hover:-translate-y-2">
                   <ProductImage
                     icon={p.icon}
                     src={p.image}
                     alt={p.name}
-                    className="aspect-[4/5] w-full"
+                    className="h-full w-full"
                     rounded="rounded-none"
                   />
-                  {/* rating — score ring in the top-right corner */}
-                  <div className="absolute right-2 top-2 rounded-full bg-raised/95 p-1 shadow-sm ring-1 ring-line/60 backdrop-blur-sm">
-                    <ScoreRing score={p.score} size={38} stroke={3.5} showTotal={false} />
+                  {/* rating — score ring floating in the top-right corner */}
+                  <div className="absolute right-1 top-1 rounded-full bg-raised/95 p-1 shadow-sm ring-1 ring-line/60 backdrop-blur-sm">
+                    <ScoreRing score={p.score} size={36} stroke={3.5} showTotal={false} />
                   </div>
                 </div>
                 <div className="mt-3 px-1">

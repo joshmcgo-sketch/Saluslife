@@ -100,14 +100,17 @@ export default function ProductImage({
   className = '',
   rounded = 'rounded-2xl',
 }) {
-  // Real photo path.
+  // Real photo path — transparent PNG cutout floating with a soft shadow.
   if (src) {
     return (
-      <div
-        className={`relative overflow-hidden ${rounded} ${className}`}
-        style={{ background: '#E6E3D8' }}
-      >
-        <img src={src} alt={alt} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      <div className={`relative ${rounded} ${className}`}>
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-contain p-[8%]"
+          style={{ filter: 'drop-shadow(0 14px 18px rgba(28,30,25,0.20))' }}
+        />
       </div>
     )
   }
