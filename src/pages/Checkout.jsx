@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import ProductImage from '../components/ProductImage'
 import Seal from '../components/Seal'
@@ -22,12 +22,26 @@ const PROMO = { code: 'SALUS20', rate: 0.2, cap: 50 }
 
 export default function Checkout() {
   const { detailed, subtotal, clear } = useCart()
+  const [searchParams] = useSearchParams()
+  const stripeSuccess = searchParams.get('success') === 'true'
+  const stripeCanceled = searchParams.get('canceled') === 'true'
+  const stripeSessionId = searchParams.get('session_id')
+
   const [placed, setPlaced] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [orderNo] = useState(() => 'SAL-' + Math.floor(100000 + Math.random() * 900000))
 
   const [codeInput, setCodeInput] = useState('')
   const [applied, setApplied] = useState(false)
   const [codeError, setCodeError] = useState('')
+
+  // A real Stripe payment finished — clear the cart now that it's actually paid for.
+  useEffect(() => {
+    if (stripeSuccess) {
+      clear()
+      window.scrollTo({ top: 0 })
+    }
+  }, [stripeSuccess])
 
   // Auto-apply the code if it was claimed from the first-visit popup.
   useEffect(() => {
@@ -64,7 +78,10 @@ export default function Checkout() {
   const total = subtotal - discount + shipping + tax
 
   // ── Order confirmed state ───────────────────────────────────────────────
-  if (placed) {
+  const showConfirmed = placed || stripeSuccess
+  const displayOrderNo = stripeSuccess ? stripeSessionId : orderNo
+
+  if (showConfirmed) {
     return (
       <div className="mx-auto max-w-content px-6 md:px-8 py-24 text-center">
         <Reveal>
@@ -73,11 +90,13 @@ export default function Checkout() {
           </div>
           <h1 className="font-display text-[2rem] text-bone">Order confirmed</h1>
           <p className="mx-auto mt-3 max-w-md text-mute">
-            Thank you. A confirmation for order <span className="text-bone">{orderNo}</span> is on its
-            way. Every item you bought carries the Salus Life mark.
+            Thank you. A confirmation for order <span className="text-bone">{displayOrderNo}</span> is
+            on its way. Every item you bought carries the Salus Life mark.
           </p>
           <p className="mx-auto mt-4 max-w-md text-xs text-faint">
-            This is a demo — no payment was taken and nothing will ship.
+            {stripeSuccess
+              ? 'Paid via Stripe checkout, test mode — no real card was charged.'
+              : 'This is a demo — no payment was taken and nothing will ship.'}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
@@ -126,12 +145,41 @@ export default function Checkout() {
         <h1 className="mt-4 font-display text-[2.2rem] font-medium tracking-tight text-bone">Checkout</h1>
       </Reveal>
 
+      {stripeCanceled && (
+        <p className="mt-6 rounded-xl border border-line bg-card px-4 py-3 text-sm text-mute">
+          Checkout canceled — your cart is still here whenever you’re ready.
+        </p>
+      )}
+
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
-          setPlaced(true)
-          clear()
-          window.scrollTo({ top: 0 })
+          setSubmitting(true)
+          try {
+            const res = await fetch('/api/create-checkout-session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                items: detailed.map((line) => ({
+                  name: line.product.name,
+                  price: line.product.price,
+                  qty: line.qty,
+                })),
+              }),
+            })
+            const data = await res.json()
+            if (!res.ok || !data.url) throw new Error(data.error || 'Checkout is unavailable.')
+            window.location.href = data.url
+          } catch {
+            // No checkout API here (e.g. the GitHub Pages mirror, which can't
+            // run server code) or the request failed — fall back to the
+            // simulated confirmation so checkout never hard-breaks.
+            setPlaced(true)
+            clear()
+            window.scrollTo({ top: 0 })
+          } finally {
+            setSubmitting(false)
+          }
         }}
         className="mt-10 grid gap-10 lg:grid-cols-[1.1fr_0.9fr]"
       >
@@ -253,9 +301,10 @@ export default function Checkout() {
 
             <button
               type="submit"
-              className="mt-6 w-full rounded-full bg-accent px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
+              disabled={submitting}
+              className="mt-6 w-full rounded-full bg-accent px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-accent-2 disabled:opacity-60"
             >
-              Place order · {money(total)}
+              {submitting ? 'Redirecting…' : `Place order · ${money(total)}`}
             </button>
             <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-faint">
               <Seal size={13} /> Every item carries the Salus Life mark
