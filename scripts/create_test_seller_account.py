@@ -46,8 +46,17 @@ def create_express_account(secret_key: str) -> dict:
                     "card_payments": {"requested": True},
                 },
             },
+            # Needed to *receive* transferred funds (e.g. from a destination
+            # charge) — without this, checkout scripts fail with
+            # insufficient_capabilities_for_transfer even after the account
+            # completes onboarding for card_payments alone.
+            "recipient": {
+                "capabilities": {
+                    "stripe_balance": {"stripe_transfers": {"requested": True}},
+                },
+            },
         },
-        "include": ["configuration.merchant", "identity", "defaults"],
+        "include": ["configuration.merchant", "configuration.recipient", "identity", "defaults"],
     }
     data = json.dumps(body).encode("utf-8")
 
@@ -77,6 +86,14 @@ def main():
     account = create_express_account(secret_key)
     print(f'Created Express account for "{SELLER_NAME}"')
     print(f"Account ID: {account['id']}")
+    print(
+        "\nThis account can't receive money yet — it still needs onboarding "
+        "(business/representative details, a bank account, etc.), same as any "
+        "new Connect account. Run scripts/create_onboarding_link.py "
+        f"(with CONNECTED_ACCOUNT_ID={account['id']} if it differs from the "
+        "default) and complete the hosted flow before using this account in "
+        "scripts/create_test_checkout_session.py."
+    )
 
 
 if __name__ == "__main__":
