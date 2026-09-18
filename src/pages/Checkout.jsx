@@ -20,6 +20,24 @@ function Field({ label, ...props }) {
 
 const PROMO = { code: 'SALUS20', rate: 0.2, cap: 50 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// STRIPE / PAYMENTS — SECURITY RULE (read before wiring up real payments)
+//
+// NEVER import the server-side `stripe` package or put a secret key
+// (sk_live_… / sk_test_…) in this file or anywhere under src/. Everything in the
+// frontend ships to the browser, so a secret key here would be public to every
+// visitor — a serious breach.
+//
+// Correct flow:
+//   • Secret key (sk_…) lives ONLY on a backend / serverless function, in env vars.
+//   • That backend creates the Stripe Checkout Session and returns its URL.
+//   • This page redirects to that URL and reads back ?success / ?canceled /
+//     ?session_id on return (the params handled below — those are safe to expose).
+//   • The client may use @stripe/stripe-js with the PUBLISHABLE key (pk_…) only.
+//
+// GitHub Pages can't run a backend, so real payments need a serverless endpoint
+// (e.g. Vercel/Netlify Functions). See SECURITY.md.
+// ─────────────────────────────────────────────────────────────────────────────
 export default function Checkout() {
   const { detailed, subtotal, clear } = useCart()
   const [searchParams] = useSearchParams()

@@ -52,3 +52,22 @@ Use a managed provider (Stripe / Shopify) for payments and accounts — they han
 compliance, CSRF, secure cookies, and rate limiting for you. Keep all secret keys in the
 host's environment variables (never in this repo), and revisit the "not applicable" table
 above item by item.
+
+## Stripe (payments in progress)
+
+The `stripe` dependency and the `?success` / `?canceled` / `?session_id` handling in
+`src/pages/Checkout.jsx` are the start of a Stripe Checkout flow. **The one rule that must
+not be broken:**
+
+- The **secret key (`sk_live_…` / `sk_test_…`) must NEVER appear in this repo or in any
+  file under `src/`.** Everything in the frontend is shipped to the browser, so a secret
+  key here is public to every visitor.
+- The server-side **`stripe`** package (now in `dependencies`) must **not** be imported
+  into client code. It belongs only in a backend / serverless function.
+- **Correct architecture:** a serverless function (Vercel/Netlify) holds the secret key in
+  an env var, creates the Checkout Session, and returns its URL. The frontend redirects to
+  that URL and reads the return params. Client code may use `@stripe/stripe-js` with the
+  **publishable key (`pk_…`)** only — that key is safe to expose.
+- GitHub Pages cannot run backend code, so shipping real payments means adding that
+  serverless endpoint (and then env vars + CORS + Stripe webhook signature verification
+  become relevant).
