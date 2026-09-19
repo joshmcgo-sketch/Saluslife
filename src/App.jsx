@@ -8,6 +8,7 @@ import PromoModal from './components/PromoModal'
 import { CartProvider } from './context/CartContext'
 import Home from './pages/Home'
 import Mission from './pages/Mission'
+import OurStandard from './pages/OurStandard'
 import StandardsPage from './pages/StandardsPage'
 import Catalog from './pages/Catalog'
 import ProductDetail from './pages/ProductDetail'
@@ -34,6 +35,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/mission" element={<Mission />} />
+            <Route path="/standards" element={<OurStandard />} />
             <Route path="/standards/equipment" element={<StandardsPage trackId="equipment" />} />
             <Route path="/standards/nutrition" element={<StandardsPage trackId="nutrition" />} />
             <Route path="/standards/household" element={<StandardsPage trackId="household" />} />

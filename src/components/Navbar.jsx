@@ -42,6 +42,7 @@ function CartButton({ className = '' }) {
 }
 
 const LINKS = [
+  { to: '/standards', label: 'Our Standard', end: true },
   { to: '/standards/equipment', label: 'Equipment' },
   { to: '/standards/nutrition', label: 'Nutrition' },
   { to: '/standards/household', label: 'Household' },
@@ -86,6 +87,7 @@ export default function Navbar() {
               <NavLink
                 key={l.to}
                 to={l.to}
+                end={l.end}
                 className={({ isActive }) =>
                   `transition-colors hover:text-bone ${isActive ? 'text-bone' : 'text-mute'}`
                 }
@@ -130,6 +132,7 @@ export default function Navbar() {
               <NavLink
                 key={l.to}
                 to={l.to}
+                end={l.end}
                 className={({ isActive }) => (isActive ? 'text-bone' : 'text-mute')}
               >
                 {l.label}
