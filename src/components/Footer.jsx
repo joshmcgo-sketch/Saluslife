@@ -20,9 +20,9 @@ export default function Footer() {
           <div>
             <div className="eyebrow mb-4">The Standard</div>
             <ul className="space-y-2.5 text-sm text-mute">
-              <li><Link to="/standards/equipment" className="hover:text-bone">Equipment standard</Link></li>
-              <li><Link to="/standards/nutrition" className="hover:text-bone">Nutrition standard</Link></li>
-              <li><Link to="/standards/household" className="hover:text-bone">Household standard</Link></li>
+              <li><Link to="/standards?track=equipment" className="hover:text-bone">Equipment standard</Link></li>
+              <li><Link to="/standards?track=nutrition" className="hover:text-bone">Nutrition standard</Link></li>
+              <li><Link to="/standards?track=household" className="hover:text-bone">Household standard</Link></li>
               <li><Link to="/catalog" className="hover:text-bone">Marked products</Link></li>
               <li><Link to="/mission" className="hover:text-bone">Mission & method</Link></li>
             </ul>

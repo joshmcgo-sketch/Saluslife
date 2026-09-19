@@ -28,7 +28,7 @@ export default {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       maxWidth: {
-        content: '1120px',
+        content: '1280px',
       },
       boxShadow: {
         card: 'inset 0 1px 0 rgba(255,255,255,0.02), 0 8px 24px -14px rgba(0,0,0,0.7)',

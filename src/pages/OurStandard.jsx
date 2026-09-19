@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import { TRACKS, PROCESS } from '../data/standards'
@@ -25,6 +25,14 @@ export default function OurStandard() {
     const t = searchParams.get('track')
     return VALID_TRACK_IDS.has(t) ? t : 'equipment'
   })
+
+  // Re-sync if a link to a different ?track= is clicked while already on
+  // this page (same route, so the component doesn't remount on its own).
+  useEffect(() => {
+    const t = searchParams.get('track')
+    if (VALID_TRACK_IDS.has(t)) setTrackId(t)
+  }, [searchParams])
+
   const track = TRACKS[trackId]
 
   return (
