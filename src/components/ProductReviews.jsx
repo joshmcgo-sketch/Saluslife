@@ -1,25 +1,27 @@
 import { useEffect, useState } from 'react'
 
 const MAX_LEN = 500
+const MAX_NAME_LEN = 60
 
-// Reviews live in localStorage only — there's no backend behind this demo,
-// so they're per-browser and won't be visible to other visitors.
-function reviewsKey(productId) {
+// Local fallback only — used when /api/reviews isn't reachable (e.g. the
+// GitHub Pages mirror, which can't run backend code). The real, shared
+// reviews live in Upstash Redis behind api/reviews.js.
+function localKey(productId) {
   return `salus-reviews-${productId}`
 }
 
-function loadReviews(productId) {
+function loadLocalReviews(productId) {
   try {
-    const raw = localStorage.getItem(reviewsKey(productId))
+    const raw = localStorage.getItem(localKey(productId))
     return raw ? JSON.parse(raw) : []
   } catch {
     return []
   }
 }
 
-function saveReviews(productId, reviews) {
+function saveLocalReviews(productId, reviews) {
   try {
-    localStorage.setItem(reviewsKey(productId), JSON.stringify(reviews))
+    localStorage.setItem(localKey(productId), JSON.stringify(reviews))
   } catch {
     /* ignore */
   }
@@ -57,38 +59,89 @@ function fmtDate(iso) {
 
 export default function ProductReviews({ productId }) {
   const [reviews, setReviews] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [offline, setOffline] = useState(false)
+
   const [rating, setRating] = useState(0)
   const [hover, setHover] = useState(0)
   const [name, setName] = useState('')
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    setReviews(loadReviews(productId))
+    let cancelled = false
+    setLoading(true)
+    fetch(`/api/reviews?productId=${encodeURIComponent(productId)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('bad response')
+        return res.json()
+      })
+      .then((data) => {
+        if (cancelled) return
+        setReviews(data.reviews || [])
+        setOffline(false)
+      })
+      .catch(() => {
+        if (cancelled) return
+        // No shared backend reachable here — fall back to this browser's
+        // own local copy so the feature still works, just not shared.
+        setReviews(loadLocalReviews(productId))
+        setOffline(true)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [productId])
 
   const average = reviews.length ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
 
-  const handleSubmit = (e) => {
+  const resetForm = () => {
+    setRating(0)
+    setName('')
+    setComment('')
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (rating < 1) {
       setError('Choose a star rating before submitting.')
       return
     }
-    const review = {
-      id: Date.now(),
-      rating,
-      name: name.trim() || 'Anonymous',
-      comment: comment.trim().slice(0, MAX_LEN),
-      date: new Date().toISOString(),
-    }
-    const next = [review, ...reviews]
-    setReviews(next)
-    saveReviews(productId, next)
-    setRating(0)
-    setName('')
-    setComment('')
     setError('')
+    setSubmitting(true)
+
+    const trimmedName = name.trim().slice(0, MAX_NAME_LEN) || 'Anonymous'
+    const trimmedComment = comment.trim().slice(0, MAX_LEN)
+
+    if (offline) {
+      const review = { id: Date.now(), rating, name: trimmedName, comment: trimmedComment, date: new Date().toISOString() }
+      const next = [review, ...reviews]
+      setReviews(next)
+      saveLocalReviews(productId, next)
+      resetForm()
+      setSubmitting(false)
+      return
+    }
+
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, rating, name: trimmedName, comment: trimmedComment }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.review) throw new Error(data.error || 'Could not submit review.')
+      setReviews((prev) => [data.review, ...prev])
+      resetForm()
+    } catch {
+      setError('Could not submit your review — try again in a moment.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -99,9 +152,15 @@ export default function ProductReviews({ productId }) {
           <StarRow value={average} />
         </div>
         <span className="text-sm text-faint">
-          {reviews.length} review{reviews.length === 1 ? '' : 's'}
+          {loading ? 'Loading reviews…' : `${reviews.length} review${reviews.length === 1 ? '' : 's'}`}
         </span>
       </div>
+
+      {offline && !loading && (
+        <p className="mt-2 text-xs text-faint">
+          Reviews aren’t syncing right now — yours will only show on this device.
+        </p>
+      )}
 
       {reviews.length > 0 && (
         <ul className="mt-6 space-y-4">
@@ -141,6 +200,7 @@ export default function ProductReviews({ productId }) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            maxLength={MAX_NAME_LEN}
             placeholder="Alex Rivera"
             className="w-full rounded-xl border border-line bg-raised px-4 py-2.5 text-sm text-bone placeholder:text-faint outline-none transition-colors focus:border-accent/60"
           />
@@ -166,9 +226,10 @@ export default function ProductReviews({ productId }) {
 
         <button
           type="submit"
-          className="mt-4 rounded-full bg-accent px-6 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
+          disabled={submitting}
+          className="mt-4 rounded-full bg-accent px-6 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-accent-2 disabled:opacity-60"
         >
-          Submit review
+          {submitting ? 'Submitting…' : 'Submit review'}
         </button>
       </form>
     </div>
