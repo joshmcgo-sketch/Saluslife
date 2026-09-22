@@ -56,13 +56,21 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const { pathname } = useLocation()
+  const isHome = pathname === '/'
 
+  // On the landing page the nav is hidden and fades in once you scroll past the
+  // full-screen hero. On every other page it stays visible.
+  const [revealed, setRevealed] = useState(!isHome)
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12)
+    const onScroll = () => {
+      const y = window.scrollY
+      setScrolled(y > 12)
+      setRevealed(!isHome || y > window.innerHeight * 0.6)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [isHome])
 
   useEffect(() => {
     setOpen(false)
@@ -71,9 +79,9 @@ export default function Navbar() {
   return (
     <>
     <header
-      className={`sticky top-0 z-50 transition-colors duration-300 ${
+      className={`sticky top-0 z-50 transition-all duration-500 ${
         scrolled ? 'bg-ink/85 backdrop-blur-md border-b border-line' : 'border-b border-transparent'
-      }`}
+      } ${revealed ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0'}`}
     >
       <div className="mx-auto max-w-content px-6 md:px-8">
         <div className="flex h-16 items-center justify-between gap-6">
