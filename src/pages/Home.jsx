@@ -41,8 +41,8 @@ function Hero() {
   const [joined, setJoined] = useState(false)
 
   return (
-    <section className="relative overflow-hidden border-b border-line">
-      <div className="relative flex min-h-[560px] flex-col justify-center gap-12 py-16 md:min-h-[640px] md:gap-20">
+    <section className="relative flex min-h-[calc(100vh-4rem)] flex-col overflow-hidden border-b border-line">
+      <div className="relative flex flex-1 flex-col justify-center gap-14 py-16 md:gap-20">
         {/* drifting product rows */}
         <GalleryRow items={ROW_A} dir="left" />
         <GalleryRow items={ROW_B} dir="right" />
@@ -90,6 +90,14 @@ function Hero() {
             </form>
           </Reveal>
         </div>
+      </div>
+
+      {/* scroll cue */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex flex-col items-center gap-1 text-faint">
+        <span className="text-[0.62rem] uppercase tracking-micro">Scroll</span>
+        <svg className="animate-bounce" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
       </div>
     </section>
   )
