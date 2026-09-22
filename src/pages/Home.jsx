@@ -6,6 +6,7 @@ import ProductCard from '../components/ProductCard'
 import ProductImage from '../components/ProductImage'
 import ScoreRing from '../components/ScoreRing'
 import Marquee from '../components/Marquee'
+import WaitlistModal from '../components/WaitlistModal'
 import { useInView } from '../lib/hooks'
 import { STATUS } from '../lib/score'
 import { PROCESS, TRACKS } from '../data/standards'
@@ -46,10 +47,11 @@ function GalleryRow({ items, dir, dur }) {
 }
 
 function Hero() {
-  const [joined, setJoined] = useState(false)
+  const [waitlistOpen, setWaitlistOpen] = useState(false)
 
   return (
-    <section className="relative flex min-h-[calc(100vh-4rem)] flex-col overflow-hidden border-b border-line">
+    <>
+    <section className="relative -mt-16 flex min-h-screen flex-col overflow-hidden border-b border-line">
       {/* full field of drifting product rows */}
       <div className="pointer-events-none absolute inset-0 flex flex-col justify-around py-4">
         {FIELD.map((r, i) => (
@@ -83,26 +85,12 @@ function Hero() {
             </p>
           </Reveal>
           <Reveal delay={240}>
-            <form
-              className="mx-auto mt-8 flex max-w-md flex-col gap-2.5 sm:flex-row"
-              onSubmit={(e) => {
-                e.preventDefault()
-                setJoined(true)
-              }}
+            <button
+              onClick={() => setWaitlistOpen(true)}
+              className="mx-auto mt-8 block rounded-full bg-accent px-8 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
             >
-              <input
-                type="email"
-                required
-                placeholder="you@email.com"
-                className="flex-1 rounded-full border border-line bg-raised px-5 py-3 text-sm text-bone placeholder:text-faint outline-none transition-colors focus:border-accent/60"
-              />
-              <button
-                type="submit"
-                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
-              >
-                {joined ? 'You’re on the list ✓' : 'Join the waitlist'}
-              </button>
-            </form>
+              Join the waitlist
+            </button>
           </Reveal>
       </div>
 
@@ -114,6 +102,8 @@ function Hero() {
         </svg>
       </div>
     </section>
+    <WaitlistModal open={waitlistOpen} onClose={() => setWaitlistOpen(false)} />
+    </>
   )
 }
 
