@@ -56,6 +56,11 @@ function Hero() {
           }}
         >
           <Reveal>
+            <div className="mb-6 flex justify-center text-bone">
+              <Seal size={78} />
+            </div>
+          </Reveal>
+          <Reveal delay={80}>
             <h1 className="mx-auto max-w-4xl font-display text-[2.6rem] font-medium leading-[0.98] tracking-[-0.02em] sm:text-[3.6rem] md:text-[4.6rem]">
               Most products don’t clear the bar.{' '}
               <span className="italic text-accent">These did.</span>
