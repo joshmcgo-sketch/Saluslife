@@ -101,6 +101,34 @@ body {
   animation-play-state: paused;
 }
 
+/* Hero kinetic gallery — two rows of floating products drifting opposite ways */
+.hero-row {
+  display: flex;
+  width: max-content;
+}
+.hero-row.left {
+  animation: hero-drift-left 46s linear infinite;
+}
+.hero-row.right {
+  animation: hero-drift-right 58s linear infinite;
+}
+@keyframes hero-drift-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes hero-drift-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -110,7 +138,9 @@ body {
     transform: none;
     transition: none;
   }
-  .marquee-track {
+  .marquee-track,
+  .hero-row.left,
+  .hero-row.right {
     animation: none;
   }
 }

@@ -6,46 +6,73 @@ import ProductCard from '../components/ProductCard'
 import ProductImage from '../components/ProductImage'
 import ScoreRing from '../components/ScoreRing'
 import Marquee from '../components/Marquee'
-import ProductMarquee from '../components/ProductMarquee'
-import { useScrollY, useInView } from '../lib/hooks'
+import { useInView } from '../lib/hooks'
 import { STATUS } from '../lib/score'
 import { PROCESS, TRACKS } from '../data/standards'
 import { PRODUCTS } from '../data/products'
 
+const ROW_A = PRODUCTS.slice(0, 12)
+const ROW_B = PRODUCTS.slice(12)
+
+// One drifting row of floating product cut-outs (decorative). Content is
+// duplicated so the -50% keyframe loops seamlessly.
+function GalleryRow({ items, dir }) {
+  return (
+    <div className={`hero-row ${dir}`} aria-hidden="true">
+      {[0, 1].map((dup) => (
+        <div key={dup} className="flex shrink-0 items-center">
+          {items.map((p) => (
+            <img
+              key={`${dup}-${p.id}`}
+              src={p.image}
+              alt=""
+              loading="lazy"
+              className="mx-5 h-24 w-auto shrink-0 object-contain sm:mx-7 sm:h-28 md:h-36 lg:h-40"
+              style={{ filter: 'drop-shadow(0 16px 18px rgba(28,30,25,0.20))' }}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function Hero() {
   const [joined, setJoined] = useState(false)
-  const y = useScrollY()
 
   return (
-    <section className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[560px] bg-gradient-to-b from-surface/50 to-transparent" />
-      <div className="relative mx-auto max-w-content px-6 md:px-8 pt-16 pb-20 md:pt-24">
-        {/* Oversized editorial headline */}
-        <div className="text-center" style={{ transform: `translateY(${y * -0.06}px)`, opacity: Math.max(0, 1 - y / 620) }}>
+    <section className="relative overflow-hidden border-b border-line">
+      <div className="relative flex min-h-[560px] flex-col justify-center gap-12 py-16 md:min-h-[640px] md:gap-20">
+        {/* drifting product rows */}
+        <GalleryRow items={ROW_A} dir="left" />
+        <GalleryRow items={ROW_B} dir="right" />
+
+        {/* centered content over a soft focus halo */}
+        <div
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center"
+          style={{
+            background:
+              'radial-gradient(58% 56% at 50% 50%, rgba(236,233,224,0.94), rgba(236,233,224,0.62) 56%, rgba(236,233,224,0.05))',
+          }}
+        >
           <Reveal>
-            <div className="mb-7 flex justify-center text-bone">
-              <Seal size={128} />
-            </div>
-          </Reveal>
-          <Reveal delay={80}>
             <div className="eyebrow mb-5">Independent certification authority</div>
           </Reveal>
-          <Reveal delay={140}>
-            <h1 className="mx-auto max-w-4xl font-display text-[2.9rem] font-medium leading-[0.98] tracking-[-0.02em] sm:text-[4rem] md:text-[5.2rem]">
-              Most products don’t
-              <br className="hidden sm:block" /> clear the bar.{' '}
+          <Reveal delay={80}>
+            <h1 className="mx-auto max-w-4xl font-display text-[2.6rem] font-medium leading-[0.98] tracking-[-0.02em] sm:text-[3.6rem] md:text-[4.6rem]">
+              Most products don’t clear the bar.{' '}
               <span className="italic text-accent">These did.</span>
             </h1>
           </Reveal>
-          <Reveal delay={220}>
-            <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-mute">
-              A standard, and the small number of products rigorous enough to meet it. No sponsorships.
-              No pay-to-list. If it carries the mark, it earned the mark.
+          <Reveal delay={160}>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-mute">
+              A standard, and the small number of products rigorous enough to meet it. No sponsorships,
+              no pay-to-list.
             </p>
           </Reveal>
-          <Reveal delay={300}>
+          <Reveal delay={240}>
             <form
-              className="mx-auto mt-9 flex max-w-md flex-col gap-2.5 sm:flex-row"
+              className="mx-auto mt-8 flex max-w-md flex-col gap-2.5 sm:flex-row"
               onSubmit={(e) => {
                 e.preventDefault()
                 setJoined(true)
@@ -66,10 +93,6 @@ function Hero() {
             </form>
           </Reveal>
         </div>
-
-        <Reveal delay={200}>
-          <ProductMarquee />
-        </Reveal>
       </div>
     </section>
   )
