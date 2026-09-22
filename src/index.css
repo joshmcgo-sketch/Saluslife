@@ -107,10 +107,10 @@ body {
   width: max-content;
 }
 .hero-row.left {
-  animation: hero-drift-left 46s linear infinite;
+  animation: hero-drift-left 55s linear infinite;
 }
 .hero-row.right {
-  animation: hero-drift-right 58s linear infinite;
+  animation: hero-drift-right 55s linear infinite;
 }
 @keyframes hero-drift-left {
   from {

@@ -11,8 +11,9 @@ import { STATUS } from '../lib/score'
 import { PROCESS, TRACKS } from '../data/standards'
 import { PRODUCTS } from '../data/products'
 
+// Same item count in both rows so their widths (and therefore scroll speed) match.
 const ROW_A = PRODUCTS.slice(0, 12)
-const ROW_B = PRODUCTS.slice(12)
+const ROW_B = PRODUCTS.slice(11, 23)
 
 // One drifting row of floating product cut-outs (decorative). Content is
 // duplicated so the -50% keyframe loops seamlessly.
