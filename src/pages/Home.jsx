@@ -73,7 +73,7 @@ function Hero() {
       SH = 58,
       SR = 26,
       ZOOM = 1.15,
-      DIST = 1.2
+      DIST = 0.7
     let current = 0,
       target = 0,
       raf = 0,
@@ -150,11 +150,11 @@ function Hero() {
 
   // Clicking the window opens it (smooth-scrolls to the fully-expanded point).
   const openByClick = () =>
-    window.scrollTo({ top: window.innerHeight * 1.25, behavior: 'smooth' })
+    window.scrollTo({ top: window.innerHeight * 0.85, behavior: 'smooth' })
 
   return (
     <>
-      <section ref={trackRef} className="relative -mt-16 h-[250vh]">
+      <section ref={trackRef} className="relative -mt-16 h-[175vh]">
         <div
           className="sticky top-0 grid h-screen place-items-center overflow-hidden"
           style={{ background: 'radial-gradient(120% 100% at 50% 0%, #33472f, #0f1710 70%)' }}
