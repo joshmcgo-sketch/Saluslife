@@ -99,6 +99,7 @@ function Hero() {
       if (overlayRef.current) {
         overlayRef.current.style.opacity = `${inn}`
         overlayRef.current.style.transform = `translateY(${18 * (1 - inn)}px)`
+        overlayRef.current.style.pointerEvents = inn > 0.5 ? 'auto' : 'none'
       }
       if (hintRef.current) hintRef.current.style.opacity = `${1 - smooth(0, 0.14, p)}`
       if (brandRef.current) {
@@ -140,6 +141,10 @@ function Hero() {
     }
   }, [])
 
+  // Clicking the window opens it (smooth-scrolls to the fully-expanded point).
+  const openByClick = () =>
+    window.scrollTo({ top: window.innerHeight * 1.25, behavior: 'smooth' })
+
   return (
     <>
       <section ref={trackRef} className="relative -mt-16 h-[250vh]">
@@ -147,19 +152,25 @@ function Hero() {
           className="sticky top-0 grid h-screen place-items-center overflow-hidden"
           style={{ background: 'radial-gradient(120% 100% at 50% 0%, #33472f, #0f1710 70%)' }}
         >
-          {/* wordmark above the box */}
+          {/* crest + wordmark above the box */}
           <div
             ref={brandRef}
-            className="pointer-events-none absolute left-0 right-0 top-[13%] z-[4] text-center font-display text-[clamp(1.4rem,3.2vw,2.2rem)] font-semibold tracking-[0.34em] text-ink/95"
-            style={{ paddingLeft: '0.34em' }}
+            className="pointer-events-none absolute left-0 right-0 top-[7%] z-[4] flex flex-col items-center gap-2.5 text-ink/95"
           >
-            SALUS&nbsp;LIFE
+            <Seal size={48} />
+            <span
+              className="font-display text-[clamp(1.4rem,3.2vw,2.2rem)] font-semibold tracking-[0.34em]"
+              style={{ paddingLeft: '0.34em' }}
+            >
+              SALUS&nbsp;LIFE
+            </span>
           </div>
 
           {/* expanding frame */}
           <div
             ref={frameRef}
-            className="absolute inset-0 overflow-hidden bg-ink"
+            onClick={openByClick}
+            className="absolute inset-0 cursor-pointer overflow-hidden bg-ink"
             style={{
               clipPath: 'inset(21% 29% 21% 29% round 26px)',
               boxShadow: '0 40px 80px -30px rgba(0,0,0,0.5)',
@@ -208,7 +219,10 @@ function Hero() {
                 sponsorships, no pay-to-list.
               </p>
               <button
-                onClick={() => setWaitlistOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setWaitlistOpen(true)
+                }}
                 className="mx-auto mt-6 block rounded-full bg-accent px-8 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
               >
                 Join the waitlist
@@ -221,7 +235,7 @@ function Hero() {
             ref={hintRef}
             className="pointer-events-none absolute bottom-[6%] left-0 right-0 z-[4] text-center text-xs font-semibold uppercase tracking-[0.18em] text-ink/85"
           >
-            Scroll ↓
+            Scroll or tap to open
           </div>
         </div>
       </section>
