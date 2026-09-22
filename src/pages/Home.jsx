@@ -59,6 +59,7 @@ function Hero() {
   const titleRef = useRef(null)
   const overlayRef = useRef(null)
   const hintRef = useRef(null)
+  const cueRef = useRef(null)
 
   useEffect(() => {
     const track = trackRef.current
@@ -102,6 +103,7 @@ function Hero() {
         overlayRef.current.style.transform = `translateY(${18 * (1 - inn)}px)`
         overlayRef.current.style.pointerEvents = inn > 0.5 ? 'auto' : 'none'
       }
+      if (cueRef.current) cueRef.current.style.opacity = `${inn}`
       if (hintRef.current) hintRef.current.style.opacity = `${1 - smooth(0, 0.14, p)}`
       if (brandRef.current) {
         const bf = smooth(0, 0.22, p)
@@ -234,6 +236,19 @@ function Hero() {
               >
                 Join the waitlist
               </button>
+            </div>
+
+            {/* scroll-down cue on the open landing */}
+            <div
+              ref={cueRef}
+              className="pointer-events-none absolute inset-x-0 bottom-6 z-[3] flex flex-col items-center gap-2 text-bone opacity-0"
+            >
+              <span className="text-[0.68rem] font-semibold uppercase tracking-micro">Scroll</span>
+              <span className="flex h-9 w-9 animate-bounce items-center justify-center rounded-full border border-bone/40 bg-raised/70 backdrop-blur-sm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
             </div>
           </div>
 
