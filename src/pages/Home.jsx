@@ -76,7 +76,8 @@ function Hero() {
       DIST = 1.2
     let current = 0,
       target = 0,
-      raf = 0
+      raf = 0,
+      opened = false
 
     const apply = (p) => {
       const e = smooth(0, 1, p)
@@ -108,7 +109,13 @@ function Hero() {
         brandRef.current.style.transform = `translateY(${-10 * bf}px)`
       }
     }
-    const read = () => clamp(-track.getBoundingClientRect().top / (window.innerHeight * DIST), 0, 1)
+    // Once fully open it stays open — scrolling back to the top won't replay it.
+    const read = () => {
+      if (opened) return 1
+      const p = clamp(-track.getBoundingClientRect().top / (window.innerHeight * DIST), 0, 1)
+      if (p >= 0.995) opened = true
+      return opened ? 1 : p
+    }
     const tick = () => {
       current += (target - current) * 0.12
       if (Math.abs(target - current) < 0.0005) current = target
