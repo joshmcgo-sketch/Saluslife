@@ -65,7 +65,7 @@ export default function Navbar() {
     const onScroll = () => {
       const y = window.scrollY
       setScrolled(y > 12)
-      setRevealed(!isHome || y > window.innerHeight * 0.6)
+      setRevealed(!isHome || y > window.innerHeight * 0.15)
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
