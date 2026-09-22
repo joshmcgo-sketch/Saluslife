@@ -52,20 +52,17 @@ function Hero() {
           className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center"
           style={{
             background:
-              'radial-gradient(58% 56% at 50% 50%, rgba(236,233,224,0.94), rgba(236,233,224,0.62) 56%, rgba(236,233,224,0.05))',
+              'radial-gradient(60% 60% at 50% 50%, rgba(236,233,224,0.97), rgba(236,233,224,0.82) 55%, rgba(236,233,224,0.12))',
           }}
         >
           <Reveal>
-            <div className="eyebrow mb-5">Independent certification authority</div>
-          </Reveal>
-          <Reveal delay={80}>
             <h1 className="mx-auto max-w-4xl font-display text-[2.6rem] font-medium leading-[0.98] tracking-[-0.02em] sm:text-[3.6rem] md:text-[4.6rem]">
               Most products don’t clear the bar.{' '}
               <span className="italic text-accent">These did.</span>
             </h1>
           </Reveal>
-          <Reveal delay={160}>
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-mute">
+          <Reveal delay={120}>
+            <p className="mx-auto mt-6 max-w-xl text-lg font-medium leading-relaxed text-bone/90">
               A standard, and the small number of products rigorous enough to meet it. No sponsorships,
               no pay-to-list.
             </p>
