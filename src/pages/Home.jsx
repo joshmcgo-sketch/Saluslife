@@ -28,7 +28,7 @@ function GalleryRow({ items, dir }) {
               src={p.image}
               alt=""
               loading="lazy"
-              className="mx-5 h-24 w-auto shrink-0 object-contain sm:mx-7 sm:h-28 md:h-36 lg:h-40"
+              className="mx-4 h-28 w-32 shrink-0 object-contain sm:mx-6 sm:h-32 sm:w-40 md:h-40 md:w-48 lg:h-44 lg:w-52"
               style={{ filter: 'drop-shadow(0 16px 18px rgba(28,30,25,0.20))' }}
             />
           ))}
@@ -53,7 +53,7 @@ function Hero() {
           className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center"
           style={{
             background:
-              'radial-gradient(60% 60% at 50% 50%, rgba(236,233,224,0.97), rgba(236,233,224,0.82) 55%, rgba(236,233,224,0.12))',
+              'radial-gradient(46% 50% at 50% 50%, rgba(236,233,224,0.95), rgba(236,233,224,0.66) 52%, rgba(236,233,224,0.04))',
           }}
         >
           <Reveal>
