@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Seal from '../components/Seal'
 import Reveal from '../components/Reveal'
 import ProductCard from '../components/ProductCard'
@@ -46,65 +46,186 @@ function GalleryRow({ items, dir, dur }) {
   )
 }
 
+// Scroll-expand intro: opens on a dark green backdrop with the SALUS LIFE
+// wordmark + "Most products don't clear the bar." over a small framed window of
+// the scrolling product field; scrolling expands the window to full screen and
+// reveals the landing, finishing with "These did." Landing page only.
 function Hero() {
   const [waitlistOpen, setWaitlistOpen] = useState(false)
+  const trackRef = useRef(null)
+  const frameRef = useRef(null)
+  const innerRef = useRef(null)
+  const brandRef = useRef(null)
+  const titleRef = useRef(null)
+  const overlayRef = useRef(null)
+  const hintRef = useRef(null)
+
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const clamp = (v, a, b) => (v < a ? a : v > b ? b : v)
+    const smooth = (a, b, x) => {
+      const t = clamp((x - a) / (b - a || 1e-6), 0, 1)
+      return t * t * (3 - 2 * t)
+    }
+    const SW = 42,
+      SH = 58,
+      SR = 26,
+      ZOOM = 1.15,
+      DIST = 1.2
+    let current = 0,
+      target = 0,
+      raf = 0
+
+    const apply = (p) => {
+      const e = smooth(0, 1, p)
+      const w = SW + (100 - SW) * e
+      const h = SH + (100 - SH) * e
+      const ix = Math.max(0, (100 - w) / 2)
+      const iy = Math.max(0, (100 - h) / 2)
+      const r = SR + (0 - SR) * e
+      if (frameRef.current) {
+        frameRef.current.style.clipPath = `inset(${iy}% ${ix}% ${iy}% ${ix}% round ${r}px)`
+        frameRef.current.style.boxShadow = `0 40px 80px -30px rgba(0,0,0,${0.5 * (1 - e)})`
+      }
+      if (innerRef.current) innerRef.current.style.transform = `scale(${ZOOM + (1 - ZOOM) * e})`
+      const out = smooth(0.35, 0.82, p)
+      if (titleRef.current) {
+        titleRef.current.style.opacity = `${1 - out}`
+        titleRef.current.style.transform = `translateY(${-26 * out}px) scale(${1 + 0.05 * out})`
+      }
+      const inn = smooth(0.62, 1, p)
+      if (overlayRef.current) {
+        overlayRef.current.style.opacity = `${inn}`
+        overlayRef.current.style.transform = `translateY(${18 * (1 - inn)}px)`
+      }
+      if (hintRef.current) hintRef.current.style.opacity = `${1 - smooth(0, 0.14, p)}`
+      if (brandRef.current) {
+        const bf = smooth(0, 0.22, p)
+        brandRef.current.style.opacity = `${1 - bf}`
+        brandRef.current.style.transform = `translateY(${-10 * bf}px)`
+      }
+    }
+    const read = () => clamp(-track.getBoundingClientRect().top / (window.innerHeight * DIST), 0, 1)
+    const tick = () => {
+      current += (target - current) * 0.12
+      if (Math.abs(target - current) < 0.0005) current = target
+      apply(current)
+      raf = current !== target ? requestAnimationFrame(tick) : 0
+    }
+    const onScroll = () => {
+      target = read()
+      if (reduce) {
+        current = target
+        apply(current)
+        return
+      }
+      if (!raf) raf = requestAnimationFrame(tick)
+    }
+    const onResize = () => {
+      target = read()
+      current = target
+      apply(current)
+    }
+    target = read()
+    current = target
+    apply(current)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize)
+    return () => {
+      if (raf) cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
 
   return (
     <>
-    <section className="relative -mt-16 flex min-h-screen flex-col overflow-hidden border-b border-line">
-      {/* full field of drifting product rows */}
-      <div className="pointer-events-none absolute inset-0 flex flex-col justify-around py-4">
-        {FIELD.map((r, i) => (
-          <GalleryRow key={i} items={r.items} dir={r.dir} dur={r.dur} />
-        ))}
-      </div>
+      <section ref={trackRef} className="relative -mt-16 h-[250vh]">
+        <div
+          className="sticky top-0 grid h-screen place-items-center overflow-hidden"
+          style={{ background: 'radial-gradient(120% 100% at 50% 0%, #33472f, #0f1710 70%)' }}
+        >
+          {/* wordmark above the box */}
+          <div
+            ref={brandRef}
+            className="pointer-events-none absolute left-0 right-0 top-[13%] z-[4] text-center font-display text-[clamp(1.4rem,3.2vw,2.2rem)] font-semibold tracking-[0.34em] text-ink/95"
+            style={{ paddingLeft: '0.34em' }}
+          >
+            SALUS&nbsp;LIFE
+          </div>
 
-      {/* centered content over a soft focus halo */}
-      <div
-        className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center"
-        style={{
-          background:
-            'radial-gradient(46% 50% at 50% 50%, rgba(236,233,224,0.95), rgba(236,233,224,0.66) 52%, rgba(236,233,224,0.04))',
-        }}
-      >
-          <Reveal>
-            <div className="mb-6 flex justify-center text-bone">
-              <Seal size={78} />
+          {/* expanding frame */}
+          <div
+            ref={frameRef}
+            className="absolute inset-0 overflow-hidden bg-ink"
+            style={{
+              clipPath: 'inset(21% 29% 21% 29% round 26px)',
+              boxShadow: '0 40px 80px -30px rgba(0,0,0,0.5)',
+            }}
+          >
+            {/* scrolling product field */}
+            <div ref={innerRef} className="absolute inset-0" style={{ transform: 'scale(1.15)', transformOrigin: 'center' }}>
+              <div className="absolute inset-0 flex flex-col justify-around py-1.5">
+                {FIELD.map((r, i) => (
+                  <GalleryRow key={i} items={r.items} dir={r.dir} dur={r.dur} />
+                ))}
+              </div>
             </div>
-          </Reveal>
-          <Reveal delay={80}>
-            <h1 className="mx-auto max-w-4xl font-display text-[2.6rem] font-medium leading-[0.98] tracking-[-0.02em] sm:text-[3.6rem] md:text-[4.6rem]">
-              Most products don’t clear the bar.{' '}
-              <span className="italic text-accent">These did.</span>
-            </h1>
-          </Reveal>
-          <Reveal delay={120}>
-            <p className="mx-auto mt-6 max-w-xl text-lg font-medium leading-relaxed text-bone/90">
-              A standard, and the small number of products rigorous enough to meet it. No sponsorships,
-              no pay-to-list.
-            </p>
-          </Reveal>
-          <Reveal delay={240}>
-            <button
-              onClick={() => setWaitlistOpen(true)}
-              className="mx-auto mt-8 block rounded-full bg-accent px-8 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
-            >
-              Join the waitlist
-            </button>
-          </Reveal>
-      </div>
 
-      {/* scroll cue */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex flex-col items-center gap-2 text-bone">
-        <span className="text-[0.68rem] font-semibold uppercase tracking-micro">Scroll</span>
-        <span className="flex h-9 w-9 animate-bounce items-center justify-center rounded-full border border-bone/40 bg-raised/70 backdrop-blur-sm">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </span>
-      </div>
-    </section>
-    <WaitlistModal open={waitlistOpen} onClose={() => setWaitlistOpen(false)} />
+            {/* intro line (fades out) */}
+            <div
+              ref={titleRef}
+              className="absolute inset-0 z-[2] grid place-items-center"
+              style={{
+                background:
+                  'radial-gradient(42% 46% at 50% 50%, rgba(236,233,224,0.94), rgba(236,233,224,0.55) 55%, rgba(236,233,224,0))',
+              }}
+            >
+              <span className="max-w-[11em] px-[6vw] text-center font-display text-[clamp(1.6rem,3.2vw,2.9rem)] font-medium leading-[1.02] tracking-[-0.02em] text-bone">
+                Most products don’t clear the bar.
+              </span>
+            </div>
+
+            {/* revealed landing (fades in) */}
+            <div
+              ref={overlayRef}
+              className="absolute inset-0 z-[3] flex flex-col items-center justify-center px-6 text-center opacity-0"
+              style={{
+                background:
+                  'radial-gradient(46% 52% at 50% 50%, rgba(236,233,224,0.95), rgba(236,233,224,0.66) 52%, rgba(236,233,224,0.05))',
+              }}
+            >
+              <div className="mb-4 flex justify-center text-bone">
+                <Seal size={64} />
+              </div>
+              <h1 className="font-display text-[clamp(2.6rem,7vw,5.4rem)] font-medium italic leading-none tracking-[-0.02em] text-accent">
+                These did.
+              </h1>
+              <p className="mx-auto mt-4 max-w-xl text-lg font-medium leading-relaxed text-bone/90">
+                A standard, and the small number of products rigorous enough to meet it. No
+                sponsorships, no pay-to-list.
+              </p>
+              <button
+                onClick={() => setWaitlistOpen(true)}
+                className="mx-auto mt-6 block rounded-full bg-accent px-8 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-accent-2"
+              >
+                Join the waitlist
+              </button>
+            </div>
+          </div>
+
+          {/* scroll hint on the dark backdrop */}
+          <div
+            ref={hintRef}
+            className="pointer-events-none absolute bottom-[6%] left-0 right-0 z-[4] text-center text-xs font-semibold uppercase tracking-[0.18em] text-ink/85"
+          >
+            Scroll ↓
+          </div>
+        </div>
+      </section>
+      <WaitlistModal open={waitlistOpen} onClose={() => setWaitlistOpen(false)} />
     </>
   )
 }
