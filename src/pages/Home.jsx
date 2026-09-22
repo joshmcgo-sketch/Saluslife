@@ -11,15 +11,22 @@ import { STATUS } from '../lib/score'
 import { PROCESS, TRACKS } from '../data/standards'
 import { PRODUCTS } from '../data/products'
 
-// Same item count in both rows so their widths (and therefore scroll speed) match.
-const ROW_A = PRODUCTS.slice(0, 12)
-const ROW_B = PRODUCTS.slice(11, 23)
+// Full-field hero: several faded rows of product cut-outs drifting slowly at
+// slightly different speeds, alternating direction. Each row's content is
+// duplicated so the -50% keyframe loops seamlessly (no stop/reset).
+const rotate = (arr, n) => arr.slice(n).concat(arr.slice(0, n))
+const FIELD = [
+  { dir: 'left', dur: 82, items: rotate(PRODUCTS, 0).slice(0, 12) },
+  { dir: 'right', dur: 96, items: rotate(PRODUCTS, 4).slice(0, 12) },
+  { dir: 'left', dur: 74, items: rotate(PRODUCTS, 8).slice(0, 12) },
+  { dir: 'right', dur: 104, items: rotate(PRODUCTS, 12).slice(0, 12) },
+  { dir: 'left', dur: 88, items: rotate(PRODUCTS, 16).slice(0, 12) },
+  { dir: 'right', dur: 78, items: rotate(PRODUCTS, 20).slice(0, 12) },
+]
 
-// One drifting row of floating product cut-outs (decorative). Content is
-// duplicated so the -50% keyframe loops seamlessly.
-function GalleryRow({ items, dir }) {
+function GalleryRow({ items, dir, dur }) {
   return (
-    <div className={`hero-row ${dir}`} aria-hidden="true">
+    <div className={`hero-row ${dir}`} aria-hidden="true" style={{ animationDuration: `${dur}s` }}>
       {[0, 1].map((dup) => (
         <div key={dup} className="flex shrink-0 items-center">
           {items.map((p) => (
@@ -28,8 +35,8 @@ function GalleryRow({ items, dir }) {
               src={p.image}
               alt=""
               loading="lazy"
-              className="mx-4 h-28 w-32 shrink-0 object-contain sm:mx-6 sm:h-32 sm:w-40 md:h-40 md:w-48 lg:h-44 lg:w-52"
-              style={{ filter: 'drop-shadow(0 16px 18px rgba(28,30,25,0.20))' }}
+              className="mx-4 h-20 w-24 shrink-0 object-contain opacity-50 sm:h-24 sm:w-28 md:h-28 md:w-36 lg:h-32 lg:w-40"
+              style={{ filter: 'drop-shadow(0 10px 12px rgba(28,30,25,0.12))' }}
             />
           ))}
         </div>
@@ -43,19 +50,21 @@ function Hero() {
 
   return (
     <section className="relative flex min-h-[calc(100vh-4rem)] flex-col overflow-hidden border-b border-line">
-      <div className="relative flex flex-1 flex-col justify-center gap-14 py-16 md:gap-20">
-        {/* drifting product rows */}
-        <GalleryRow items={ROW_A} dir="left" />
-        <GalleryRow items={ROW_B} dir="right" />
+      {/* full field of drifting product rows */}
+      <div className="pointer-events-none absolute inset-0 flex flex-col justify-around py-4">
+        {FIELD.map((r, i) => (
+          <GalleryRow key={i} items={r.items} dir={r.dir} dur={r.dur} />
+        ))}
+      </div>
 
-        {/* centered content over a soft focus halo */}
-        <div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center"
-          style={{
-            background:
-              'radial-gradient(46% 50% at 50% 50%, rgba(236,233,224,0.95), rgba(236,233,224,0.66) 52%, rgba(236,233,224,0.04))',
-          }}
-        >
+      {/* centered content over a soft focus halo */}
+      <div
+        className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center"
+        style={{
+          background:
+            'radial-gradient(46% 50% at 50% 50%, rgba(236,233,224,0.95), rgba(236,233,224,0.66) 52%, rgba(236,233,224,0.04))',
+        }}
+      >
           <Reveal>
             <div className="mb-6 flex justify-center text-bone">
               <Seal size={78} />
@@ -95,7 +104,6 @@ function Hero() {
               </button>
             </form>
           </Reveal>
-        </div>
       </div>
 
       {/* scroll cue */}
