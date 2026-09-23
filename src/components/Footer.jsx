@@ -55,7 +55,7 @@ export default function Footer() {
           <div>
             <div className="eyebrow mb-4">Contact</div>
             <ul className="space-y-2.5 text-sm text-mute">
-              <li><a href="mailto:hello@saluslife.example" className="hover:text-bone">hello@saluslife.example</a></li>
+              <li><a href="mailto:support@saluslife.net" className="hover:text-bone">support@saluslife.net</a></li>
               <li><Link to="/submit" className="hover:text-bone">Submit a product</Link></li>
             </ul>
 
