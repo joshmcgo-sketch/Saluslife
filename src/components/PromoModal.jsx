@@ -47,7 +47,16 @@ export default function PromoModal() {
       /* private mode */
     }
     if (seen) return
-    const t = setTimeout(() => setOpen(true), 1600)
+
+    const show = () => setOpen(true)
+    // On the landing (which has the scroll-expand intro) wait until the intro
+    // has opened before showing the coupon; elsewhere fall back to a short timer.
+    const hasIntro = document.querySelector('[data-intro]')
+    if (hasIntro) {
+      window.addEventListener('salus-intro-opened', show, { once: true })
+      return () => window.removeEventListener('salus-intro-opened', show)
+    }
+    const t = setTimeout(show, 1600)
     return () => clearTimeout(t)
   }, [])
 

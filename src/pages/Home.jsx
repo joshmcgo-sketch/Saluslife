@@ -70,8 +70,8 @@ function Hero() {
       const t = clamp((x - a) / (b - a || 1e-6), 0, 1)
       return t * t * (3 - 2 * t)
     }
-    const SW = 42,
-      SH = 58,
+    const SW = 100, // start full-width (edge to edge)
+      SH = 58, // start height (unchanged)
       SR = 26,
       ZOOM = 1.15,
       DIST = 0.7
@@ -115,7 +115,10 @@ function Hero() {
     const read = () => {
       if (opened) return 1
       const p = clamp(-track.getBoundingClientRect().top / (window.innerHeight * DIST), 0, 1)
-      if (p >= 0.995) opened = true
+      if (p >= 0.995) {
+        opened = true
+        window.dispatchEvent(new Event('salus-intro-opened')) // cue the coupon
+      }
       return opened ? 1 : p
     }
     const tick = () => {
@@ -156,7 +159,7 @@ function Hero() {
 
   return (
     <>
-      <section ref={trackRef} className="relative -mt-16 h-[175vh]">
+      <section ref={trackRef} data-intro className="relative -mt-16 h-[175vh]">
         <div
           className="sticky top-0 grid h-screen place-items-center overflow-hidden"
           style={{ background: 'radial-gradient(120% 100% at 50% 0%, #33472f, #0f1710 70%)' }}
@@ -181,7 +184,7 @@ function Hero() {
             onClick={openByClick}
             className="absolute inset-0 cursor-pointer overflow-hidden bg-ink"
             style={{
-              clipPath: 'inset(21% 29% 21% 29% round 26px)',
+              clipPath: 'inset(21% 0% 21% 0% round 26px)',
               boxShadow: '0 40px 80px -30px rgba(0,0,0,0.5)',
             }}
           >
