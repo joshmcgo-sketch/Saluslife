@@ -49,12 +49,19 @@ export default function PromoModal() {
     if (seen) return
 
     const show = () => setOpen(true)
-    // On the landing (which has the scroll-expand intro) wait until the intro
-    // has opened before showing the coupon; elsewhere fall back to a short timer.
+    // On the landing (which has the scroll-expand intro) wait until the visitor
+    // has scrolled past the intro before showing the coupon; elsewhere fall back
+    // to a short timer.
     const hasIntro = document.querySelector('[data-intro]')
     if (hasIntro) {
-      window.addEventListener('salus-intro-opened', show, { once: true })
-      return () => window.removeEventListener('salus-intro-opened', show)
+      const onScroll = () => {
+        if (window.scrollY > window.innerHeight * 0.72) {
+          show()
+          window.removeEventListener('scroll', onScroll)
+        }
+      }
+      window.addEventListener('scroll', onScroll, { passive: true })
+      return () => window.removeEventListener('scroll', onScroll)
     }
     const t = setTimeout(show, 1600)
     return () => clearTimeout(t)
